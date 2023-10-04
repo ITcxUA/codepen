@@ -1,96 +1,53 @@
 // Polyfills
 
 if ( Number.EPSILON === undefined ) {
-
 	Number.EPSILON = Math.pow( 2, - 52 );
-
 }
-
 if ( Number.isInteger === undefined ) {
-
 	// Missing in IE
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
-
 	Number.isInteger = function ( value ) {
-
 		return typeof value === 'number' && isFinite( value ) && Math.floor( value ) === value;
-
 	};
-
 }
 
-//
-
+// *******************************************************
 if ( Math.sign === undefined ) {
-
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
-
 	Math.sign = function ( x ) {
-
 		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : + x;
-
 	};
-
 }
-
 if ( 'name' in Function.prototype === false ) {
-
 	// Missing in IE
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
-
 	Object.defineProperty( Function.prototype, 'name', {
-
 		get: function () {
-
 			return this.toString().match( /^\s*function\s*([^\(\s]*)/ )[ 1 ];
-
 		}
-
 	} );
-
 }
-
 if ( Object.assign === undefined ) {
-
 	// Missing in IE
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-
 	Object.assign = function ( target ) {
-
 		if ( target === undefined || target === null ) {
-
 			throw new TypeError( 'Cannot convert undefined or null to object' );
-
 		}
-
 		const output = Object( target );
-
 		for ( let index = 1; index < arguments.length; index ++ ) {
-
 			const source = arguments[ index ];
-
 			if ( source !== undefined && source !== null ) {
-
 				for ( const nextKey in source ) {
-
 					if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
-
 						output[ nextKey ] = source[ nextKey ];
-
 					}
-
 				}
-
 			}
-
 		}
-
 		return output;
-
 	};
-
 }
-
 const REVISION = '118';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -298,82 +255,45 @@ const StreamCopyUsage = 35042;
 function EventDispatcher() {}
 
 Object.assign( EventDispatcher.prototype, {
-
 	addEventListener: function ( type, listener ) {
-
 		if ( this._listeners === undefined ) this._listeners = {};
-
 		const listeners = this._listeners;
-
 		if ( listeners[ type ] === undefined ) {
-
 			listeners[ type ] = [];
-
 		}
-
 		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
-
 			listeners[ type ].push( listener );
-
 		}
-
 	},
-
 	hasEventListener: function ( type, listener ) {
-
 		if ( this._listeners === undefined ) return false;
-
 		const listeners = this._listeners;
-
 		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
-
 	},
-
 	removeEventListener: function ( type, listener ) {
-
 		if ( this._listeners === undefined ) return;
-
 		const listeners = this._listeners;
 		const listenerArray = listeners[ type ];
-
 		if ( listenerArray !== undefined ) {
-
 			const index = listenerArray.indexOf( listener );
-
 			if ( index !== - 1 ) {
-
 				listenerArray.splice( index, 1 );
-
 			}
-
 		}
-
 	},
-
 	dispatchEvent: function ( event ) {
-
 		if ( this._listeners === undefined ) return;
-
 		const listeners = this._listeners;
 		const listenerArray = listeners[ event.type ];
-
 		if ( listenerArray !== undefined ) {
-
 			event.target = this;
-
 			// Make a copy, in case listeners are removed while iterating.
 			const array = listenerArray.slice( 0 );
-
 			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
 				array[ i ].call( this, event );
-
 			}
-
 		}
-
 	}
-
 } );
 
 /**
@@ -384,22 +304,14 @@ Object.assign( EventDispatcher.prototype, {
  */
 
 const _lut = [];
-
 for ( let i = 0; i < 256; i ++ ) {
-
 	_lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
-
 }
-
 const MathUtils = {
-
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
-
 	generateUUID: function () {
-
 		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
-
 		const d0 = Math.random() * 0xffffffff | 0;
 		const d1 = Math.random() * 0xffffffff | 0;
 		const d2 = Math.random() * 0xffffffff | 0;
@@ -408,125 +320,67 @@ const MathUtils = {
 			_lut[ d1 & 0xff ] + _lut[ d1 >> 8 & 0xff ] + '-' + _lut[ d1 >> 16 & 0x0f | 0x40 ] + _lut[ d1 >> 24 & 0xff ] + '-' +
 			_lut[ d2 & 0x3f | 0x80 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
 			_lut[ d3 & 0xff ] + _lut[ d3 >> 8 & 0xff ] + _lut[ d3 >> 16 & 0xff ] + _lut[ d3 >> 24 & 0xff ];
-
 		// .toUpperCase() here flattens concatenated strings to save heap memory space.
 		return uuid.toUpperCase();
-
 	},
-
 	clamp: function ( value, min, max ) {
-
 		return Math.max( min, Math.min( max, value ) );
-
 	},
-
 	// compute euclidian modulo of m % n
 	// https://en.wikipedia.org/wiki/Modulo_operation
-
 	euclideanModulo: function ( n, m ) {
-
 		return ( ( n % m ) + m ) % m;
-
 	},
-
 	// Linear mapping from range <a1, a2> to range <b1, b2>
-
 	mapLinear: function ( x, a1, a2, b1, b2 ) {
-
 		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
-
 	},
-
 	// https://en.wikipedia.org/wiki/Linear_interpolation
-
 	lerp: function ( x, y, t ) {
-
 		return ( 1 - t ) * x + t * y;
-
 	},
-
 	// http://en.wikipedia.org/wiki/Smoothstep
-
 	smoothstep: function ( x, min, max ) {
-
 		if ( x <= min ) return 0;
 		if ( x >= max ) return 1;
-
 		x = ( x - min ) / ( max - min );
-
 		return x * x * ( 3 - 2 * x );
-
 	},
-
 	smootherstep: function ( x, min, max ) {
-
 		if ( x <= min ) return 0;
 		if ( x >= max ) return 1;
-
 		x = ( x - min ) / ( max - min );
-
 		return x * x * x * ( x * ( x * 6 - 15 ) + 10 );
-
 	},
-
 	// Random integer from <low, high> interval
-
 	randInt: function ( low, high ) {
-
 		return low + Math.floor( Math.random() * ( high - low + 1 ) );
-
 	},
-
 	// Random float from <low, high> interval
-
 	randFloat: function ( low, high ) {
-
 		return low + Math.random() * ( high - low );
-
 	},
-
 	// Random float from <-range/2, range/2> interval
-
 	randFloatSpread: function ( range ) {
-
 		return range * ( 0.5 - Math.random() );
-
 	},
-
 	degToRad: function ( degrees ) {
-
 		return degrees * MathUtils.DEG2RAD;
-
 	},
-
 	radToDeg: function ( radians ) {
-
 		return radians * MathUtils.RAD2DEG;
-
 	},
-
 	isPowerOfTwo: function ( value ) {
-
 		return ( value & ( value - 1 ) ) === 0 && value !== 0;
-
 	},
-
 	ceilPowerOfTwo: function ( value ) {
-
 		return Math.pow( 2, Math.ceil( Math.log( value ) / Math.LN2 ) );
-
 	},
-
 	floorPowerOfTwo: function ( value ) {
-
 		return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
-
 	},
-
 	setQuaternionFromProperEuler: function ( q, a, b, c, order ) {
-
 		// Intrinsic Proper Euler Angles - see https://en.wikipedia.org/wiki/Euler_angles
-
 		// rotations are applied to the axes in the order specified by 'order'
 		// rotation by angle 'a' is applied first, then by angle 'b', then by angle 'c'
 		// angles are in radians
@@ -51355,7 +51209,7 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 } );
 
-//
+// *******************************************************
 
 Object.defineProperties( Audio.prototype, {
 
@@ -51400,137 +51254,81 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 };
 
-//
-
+// *******************************************************
 const GeometryUtils = {
-
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
-
 		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
 		let matrix;
-
 		if ( geometry2.isMesh ) {
-
 			geometry2.matrixAutoUpdate && geometry2.updateMatrix();
-
 			matrix = geometry2.matrix;
 			geometry2 = geometry2.geometry;
-
 		}
-
 		geometry1.merge( geometry2, matrix, materialIndexOffset );
-
 	},
-
 	center: function ( geometry ) {
-
 		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
 		return geometry.center();
-
 	}
-
 };
-
 ImageUtils.crossOrigin = undefined;
-
 ImageUtils.loadTexture = function ( url, mapping, onLoad, onError ) {
-
 	console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
-
 	const loader = new TextureLoader();
 	loader.setCrossOrigin( this.crossOrigin );
-
 	const texture = loader.load( url, onLoad, undefined, onError );
-
 	if ( mapping ) texture.mapping = mapping;
-
 	return texture;
-
 };
-
 ImageUtils.loadTextureCube = function ( urls, mapping, onLoad, onError ) {
-
 	console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
-
 	const loader = new CubeTextureLoader();
 	loader.setCrossOrigin( this.crossOrigin );
-
+	
 	const texture = loader.load( urls, onLoad, undefined, onError );
-
 	if ( mapping ) texture.mapping = mapping;
-
 	return texture;
-
 };
-
 ImageUtils.loadCompressedTexture = function () {
-
 	console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' );
-
 };
-
 ImageUtils.loadCompressedTextureCube = function () {
-
 	console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
-
 };
 
-//
-
+// *******************************************************
 function CanvasRenderer() {
-
 	console.error( 'THREE.CanvasRenderer has been removed' );
-
 }
 
-//
-
+// *******************************************************
 function JSONLoader() {
-
 	console.error( 'THREE.JSONLoader has been removed.' );
-
 }
 
-//
-
+// *******************************************************
 const SceneUtils = {
-
 	createMultiMaterialObject: function ( /* geometry, materials */ ) {
-
 		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
-
 	},
-
 	detach: function ( /* child, parent, scene */ ) {
-
 		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
-
 	},
-
 	attach: function ( /* child, scene, parent */ ) {
-
 		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
-
 	}
-
 };
 
-//
-
+// *******************************************************
 function LensFlare() {
-
 	console.error( 'THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js' );
-
 }
-
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
-
 	/* eslint-disable no-undef */
 	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
 		revision: REVISION,
 	} } ) );
 	/* eslint-enable no-undef */
-
 }
 
 export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, ClosedSplineCurve3, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeBufferGeometry, ConeGeometry, CubeCamera, BoxGeometry as CubeGeometry, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DirectionalLightShadow, DiscreteInterpolant, DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeBufferGeometry, ExtrudeGeometry, Face3, Face4, FaceColors, FileLoader, FlatShading, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FrontFaceDirectionCCW, FrontFaceDirectionCW, FrontSide, Frustum, GammaEncoding, Geometry, GeometryUtils, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, LightShadow, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LogLuvEncoding, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils as Math, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricBufferGeometry, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDEncoding, RGBEEncoding, RGBEFormat, RGBFormat, RGBIntegerFormat, RGBM16Encoding, RGBM7Encoding, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingBufferGeometry, RingGeometry, SRGB8_ALPHA8_ASTC_10x10_Format, SRGB8_ALPHA8_ASTC_10x5_Format, SRGB8_ALPHA8_ASTC_10x6_Format, SRGB8_ALPHA8_ASTC_10x8_Format, SRGB8_ALPHA8_ASTC_12x10_Format, SRGB8_ALPHA8_ASTC_12x12_Format, SRGB8_ALPHA8_ASTC_4x4_Format, SRGB8_ALPHA8_ASTC_5x4_Format, SRGB8_ALPHA8_ASTC_5x5_Format, SRGB8_ALPHA8_ASTC_6x5_Format, SRGB8_ALPHA8_ASTC_6x6_Format, SRGB8_ALPHA8_ASTC_8x5_Format, SRGB8_ALPHA8_ASTC_8x6_Format, SRGB8_ALPHA8_ASTC_8x8_Format, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, Spline, SplineCurve, SplineCurve3, SpotLight, SpotLightHelper, SpotLightShadow, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronBufferGeometry, TetrahedronGeometry, TextBufferGeometry, TextGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusGeometry, TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VideoTexture, WebGL1Renderer, WebGLCubeRenderTarget, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, sRGBEncoding };
