@@ -462,9 +462,7 @@ Object.defineProperties( Vector2.prototype, {
 		set: function ( value ) {
 
 			this.x = value;
-
 		}
-
 	},
 
 	"height": {
